@@ -1,4 +1,5 @@
 import { integer, text, pgTable, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { InferSelectModel } from 'drizzle-orm';
 
 export const items = pgTable('item', {
   id: integer('id').primaryKey(),
@@ -8,3 +9,5 @@ export const items = pgTable('item', {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   customData: jsonb('custom_data').$type<Record<string, any> | null>().default(null),
 });
+
+export type Item = InferSelectModel<typeof items>;
