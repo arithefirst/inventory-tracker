@@ -64,17 +64,17 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
                 <TableRow>
                   <TableCell className="font-bold">ID</TableCell>
                   <TableCell>{id}</TableCell>
-                  <CopyCell value={id} />
+                  <CopyCell value={id} property="ID" />
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-bold">Created At</TableCell>
                   <TableCell>{formatDate(createdAt)}</TableCell>
-                  <CopyCell value={formatDate(createdAt)} />
+                  <CopyCell value={formatDate(createdAt)} property="Created At" />
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-bold">Updated At</TableCell>
                   <TableCell>{formatDate(updatedAt)}</TableCell>
-                  <CopyCell value={formatDate(updatedAt)} />
+                  <CopyCell value={formatDate(updatedAt)} property="Updated At" />
                 </TableRow>
                 {/* Itterate over the object.keys of customdata so we can display */}
                 {/* user-created fields in addition to the hardcoded ones */}
@@ -84,6 +84,7 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
                       <TableRow key={key}>
                         <TableCell className="font-bold">{key}</TableCell>
                         <TableCell>{`${customData[key]}`}</TableCell>
+                        <CopyCell value={customData[key]} property={key} />
                       </TableRow>
                     );
                   })
