@@ -1,13 +1,13 @@
 'use client';
 
+import { updateDataValue } from '@/app/actions';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Clipboard, ClipboardCheck, ClipboardX, Pencil, X, Loader } from 'lucide-react';
+import { Clipboard, ClipboardCheck, ClipboardX, Loader, Pencil, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { updateDataValue } from '@/app/actions';
-
 interface DataTableRowProps {
   item: string;
   value: string | number;
@@ -33,57 +33,81 @@ export function DataTableRow({ item, value, itemInternal, itemId }: DataTableRow
   const [isEditing, setEditing] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number>(value);
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+  const [dupeIdError, setDupeIdError] = useState<boolean>(false);
   const fieldEditable = itemInternal !== 'updatedAt' && itemInternal !== 'createdAt';
 
   async function executeUpdate() {
     setUpdateLoading(true);
-    await updateDataValue(itemInternal, itemId, inputValue);
+    try {
+      await updateDataValue(itemInternal, itemId, inputValue);
+    } catch (e) {
+      if ((e as Error).message.includes('duplicate key value violates unique constraint')) {
+        setDupeIdError(true);
+      }
+    }
     setUpdateLoading(false);
     setEditing(false);
   }
 
   return (
-    <TableRow>
-      <TableCell className="font-bold">{item}</TableCell>
-      {isEditing ? (
-        <TableCell className="w-1/2">
-          <div className="flex gap-1">
-            <Input
-              className="flex-grow"
-              defaultValue={value}
-              onInput={(e) => setInputValue((e.target as HTMLInputElement).value)}
-            ></Input>
-            <Button className="w-16 cursor-pointer" onClick={executeUpdate}>
-              {updateLoading ? <Loader className="animate-spin" /> : 'Save'}
+    <>
+      {itemInternal === 'id' ? (
+        <Dialog open={dupeIdError} onOpenChange={() => setDupeIdError((s) => !s)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Error</DialogTitle>
+            </DialogHeader>
+            An item with the ID {inputValue} already exists.
+            <Button className="cursor-pointer" onClick={() => setDupeIdError(false)}>
+              Okay
             </Button>
-          </div>
-        </TableCell>
+          </DialogContent>
+        </Dialog>
       ) : (
-        <TableCell>{value}</TableCell>
+        <></>
       )}
-      <TableCell className="flex gap-2">
-        <Button
-          onClick={() => copy(item, value)}
-          size={fieldEditable ? 'icon' : 'default'}
-          className={'text-primary-foreground my-auto cursor-pointer ' + (fieldEditable ? 'w-9' : 'w-20')}
-          title="Copy property value to clipboard"
-        >
-          <Clipboard />
-        </Button>
-
-        {fieldEditable ? (
-          <Button
-            onClick={() => setEditing((s) => !s)}
-            size="icon"
-            className="text-primary-foreground my-auto cursor-pointer"
-            title={isEditing ? 'Cancel edits' : 'Edit property value'}
-          >
-            {isEditing ? <X /> : <Pencil />}
-          </Button>
+      <TableRow>
+        <TableCell className="font-bold">{item}</TableCell>
+        {isEditing ? (
+          <TableCell className="w-1/2">
+            <div className="flex gap-1">
+              <Input
+                className="flex-grow"
+                defaultValue={value}
+                onInput={(e) => setInputValue((e.target as HTMLInputElement).value)}
+              ></Input>
+              <Button className="w-16 cursor-pointer" onClick={executeUpdate}>
+                {updateLoading ? <Loader className="animate-spin" /> : 'Save'}
+              </Button>
+            </div>
+          </TableCell>
         ) : (
-          <></>
+          <TableCell>{value}</TableCell>
         )}
-      </TableCell>
-    </TableRow>
+        <TableCell className="flex gap-2">
+          <Button
+            onClick={() => copy(item, value)}
+            size={fieldEditable ? 'icon' : 'default'}
+            className={'text-primary-foreground my-auto cursor-pointer ' + (fieldEditable ? 'w-9' : 'w-20')}
+            title="Copy property value to clipboard"
+          >
+            <Clipboard />
+          </Button>
+
+          {fieldEditable ? (
+            <Button
+              onClick={() => setEditing((s) => !s)}
+              size="icon"
+              className="text-primary-foreground my-auto cursor-pointer"
+              title={isEditing ? 'Cancel edits' : 'Edit property value'}
+            >
+              {isEditing ? <X /> : <Pencil />}
+            </Button>
+          ) : (
+            <></>
+          )}
+        </TableCell>
+      </TableRow>
+    </>
   );
 }
