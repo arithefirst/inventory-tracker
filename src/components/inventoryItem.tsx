@@ -2,7 +2,7 @@ import type { Item } from '@/db/schema';
 import Image from 'next/image';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 export function InventoryItem({ id, name, createdAt, image, customData }: Item) {
   const formattedDate = createdAt.toLocaleString('en-US', {
@@ -15,7 +15,7 @@ export function InventoryItem({ id, name, createdAt, image, customData }: Item) 
   });
 
   return (
-    <Card className="cursor-pointer transition-all duration-300 ease-in-out hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/30">
+    <Card className="hover:border-primary hover:shadow-primary/30 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl">
       <CardContent>
         <p className="w-full text-center font-bold">{name}</p>
         <div className="grid grid-cols-2">
