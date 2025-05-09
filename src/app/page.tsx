@@ -20,7 +20,7 @@ export default async function Home() {
           <h1 className="text-foreground/40 text-3xl">No items in inventory.</h1>
         </main>
       ) : (
-        <main className="grid grid-cols-4 gap-2 p-2">
+        <main className="grid grid-cols-3 gap-2 p-2">
           {inventory.map((item) => (
             <InventoryItem {...item} key={item.id} />
           ))}
