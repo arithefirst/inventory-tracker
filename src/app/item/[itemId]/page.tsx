@@ -1,0 +1,100 @@
+import { ThemeToggle } from '@/components/themeToggle';
+import { db } from '@/db/drizzle';
+import { items } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CopyCell } from '@/components/copyCell';
+
+export default async function Page({ params }: { params: Promise<{ itemId: number }> }) {
+  const { itemId } = await params;
+  const { name, image, id, createdAt, updatedAt, customData } = (
+    await db.select().from(items).where(eq(items.id, itemId))
+  )[0];
+
+  function formatDate(date: Date): string {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+  }
+
+  return (
+    <div className="flex min-h-screen w-screen flex-col">
+      <header className="border-b-border flex w-screen items-center border-b px-4 py-2">
+        <Link href="/">
+          <span className="mr-1 font-bold">{process.env.NEXT_PUBILC_COMPANYNAME}</span>
+          Inventory Manager
+        </Link>
+        <ThemeToggle className="ml-auto" />
+      </header>
+      <main className="grid flex-1 grid-cols-6 grid-rows-1 gap-4 p-2">
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>
+              {name} <span className="font-thin">(Images)</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="border-border relative mx-auto my-4 aspect-video w-full overflow-hidden rounded-md border bg-white">
+              <Image
+                fill={true}
+                src={image}
+                alt={name}
+                className="object-contain transition-transform hover:scale-105"
+              />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>
+              {name} <span className="font-thin">(Data)</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table className="border-t">
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-bold">ID</TableCell>
+                  <TableCell>{id}</TableCell>
+                  <CopyCell value={id} />
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-bold">Created At</TableCell>
+                  <TableCell>{formatDate(createdAt)}</TableCell>
+                  <CopyCell value={formatDate(createdAt)} />
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-bold">Updated At</TableCell>
+                  <TableCell>{formatDate(updatedAt)}</TableCell>
+                  <CopyCell value={formatDate(updatedAt)} />
+                </TableRow>
+                {/* Itterate over the object.keys of customdata so we can display */}
+                {/* user-created fields in addition to the hardcoded ones */}
+                {customData ? (
+                  Object.keys(customData).map((key) => {
+                    return (
+                      <TableRow key={key}>
+                        <TableCell className="font-bold">{key}</TableCell>
+                        <TableCell>{`${customData[key]}`}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <></>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}
