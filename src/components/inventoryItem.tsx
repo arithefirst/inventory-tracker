@@ -1,17 +1,57 @@
 import type { Item } from '@/db/schema';
 import Image from 'next/image';
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 export function InventoryItem({ id, name, createdAt, image, customData }: Item) {
+  const formattedDate = createdAt.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
+
   return (
     <Card className="cursor-pointer transition-all duration-300 ease-in-out hover:-translate-y-2.5 hover:shadow-xl">
       <CardContent>
         <p className="w-full text-center font-bold">{name}</p>
-        <div className="relative mx-auto aspect-square w-3/4 object-cover">
-          <Image fill={true} src={image} alt={name} />
+        <div className="relative mx-auto my-4 aspect-square w-3/4 object-cover p-6">
+          <Image fill={true} src={image} alt={name} className="rounded-md" />
         </div>
-        <p className="text-foreground/40 w-full text-center italic">{id}</p>
+        <hr className="mx-auto"></hr>
+        <Table className="mx-auto w-fit">
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-bold">ID</TableCell>
+              <TableCell>{id}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-bold">Name</TableCell>
+              <TableCell>{name}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-bold">Created At</TableCell>
+              <TableCell>{formattedDate}</TableCell>
+            </TableRow>
+            {/* Itterate over the object.keys of customdata so we can display */}
+            {/* user-created fields in addition to the hardcoded ones */}
+            {customData ? (
+              Object.keys(customData).map((key) => {
+                return (
+                  <TableRow key={key}>
+                    <TableCell className="font-bold">{key}</TableCell>
+                    <TableCell>{`${customData[key]}`}</TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <></>
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
