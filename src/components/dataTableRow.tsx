@@ -3,14 +3,16 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Clipboard, ClipboardCheck, ClipboardX, Pencil, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Clipboard, ClipboardCheck, ClipboardX, Pencil, X, Loader } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
+import { updateDataValue } from '@/app/actions';
 
 interface DataTableRowProps {
   item: string;
   value: string | number;
   itemInternal: string;
+  itemId: number;
 }
 
 async function copy(item: string, value: string | number) {
@@ -27,10 +29,18 @@ async function copy(item: string, value: string | number) {
   }
 }
 
-export function DataTableRow({ item, value }: DataTableRowProps) {
+export function DataTableRow({ item, value, itemInternal, itemId }: DataTableRowProps) {
   const [isEditing, setEditing] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string | number>(value);
+  const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+  const fieldEditable = itemInternal !== 'updatedAt' && itemInternal !== 'createdAt';
 
-  useEffect(() => console.log(isEditing), [isEditing]);
+  async function executeUpdate() {
+    setUpdateLoading(true);
+    await updateDataValue(itemInternal, itemId, inputValue);
+    setUpdateLoading(false);
+    setEditing(false);
+  }
 
   return (
     <TableRow>
@@ -38,8 +48,14 @@ export function DataTableRow({ item, value }: DataTableRowProps) {
       {isEditing ? (
         <TableCell className="w-1/2">
           <div className="flex gap-1">
-            <Input className="flex-grow" defaultValue={value}></Input>
-            <Button className="cursor-pointer">Save</Button>
+            <Input
+              className="flex-grow"
+              defaultValue={value}
+              onInput={(e) => setInputValue((e.target as HTMLInputElement).value)}
+            ></Input>
+            <Button className="w-16 cursor-pointer" onClick={executeUpdate}>
+              {updateLoading ? <Loader className="animate-spin" /> : 'Save'}
+            </Button>
           </div>
         </TableCell>
       ) : (
@@ -48,20 +64,25 @@ export function DataTableRow({ item, value }: DataTableRowProps) {
       <TableCell className="flex gap-2">
         <Button
           onClick={() => copy(item, value)}
-          size="icon"
-          className="text-primary-foreground my-auto cursor-pointer"
+          size={fieldEditable ? 'icon' : 'default'}
+          className={'text-primary-foreground my-auto cursor-pointer ' + (fieldEditable ? 'w-9' : 'w-20')}
           title="Copy property value to clipboard"
         >
           <Clipboard />
         </Button>
-        <Button
-          onClick={() => setEditing((s) => !s)}
-          size="icon"
-          className="text-primary-foreground my-auto cursor-pointer"
-          title="Edit property value"
-        >
-          {isEditing ? <X /> : <Pencil />}
-        </Button>
+
+        {fieldEditable ? (
+          <Button
+            onClick={() => setEditing((s) => !s)}
+            size="icon"
+            className="text-primary-foreground my-auto cursor-pointer"
+            title={isEditing ? 'Cancel edits' : 'Edit property value'}
+          >
+            {isEditing ? <X /> : <Pencil />}
+          </Button>
+        ) : (
+          <></>
+        )}
       </TableCell>
     </TableRow>
   );
