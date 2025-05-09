@@ -4,6 +4,7 @@ import { db } from '@/db/drizzle';
 import { items } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 /**
  * Updates a field on an item in the database
@@ -28,10 +29,13 @@ export async function updateDataValue(field: string, itemId: number, newValue: s
     const { customData } = result[0];
     customData![key] = newValue;
 
-    await db.update(items).set({
-      customData,
-      updatedAt: new Date(),
-    });
+    await db
+      .update(items)
+      .set({
+        customData,
+        updatedAt: new Date(),
+      })
+      .where(eq(items.id, itemId));
   }
 
   // Otherwise just update the field
@@ -43,7 +47,11 @@ export async function updateDataValue(field: string, itemId: number, newValue: s
     })
     .where(eq(items.id, itemId));
 
-  revalidatePath(`/item/${itemId}`);
+  if (field === 'id') {
+    redirect(`/item/${newValue}`);
+  } else {
+    revalidatePath(`/item/${itemId}`);
+  }
 }
 
 export async function addCustomField(field: string, value: string | number, itemId: number) {
@@ -59,10 +67,13 @@ export async function addCustomField(field: string, value: string | number, item
 
   if (customData[field] === undefined) {
     customData[field] = value;
-    await db.update(items).set({
-      customData,
-      updatedAt: new Date(),
-    });
+    await db
+      .update(items)
+      .set({
+        customData,
+        updatedAt: new Date(),
+      })
+      .where(eq(items.id, itemId));
   }
 
   revalidatePath(`/item/${itemId}`);
