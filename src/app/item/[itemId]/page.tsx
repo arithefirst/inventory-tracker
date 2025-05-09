@@ -42,12 +42,20 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="border-border relative mx-auto my-4 aspect-video w-full overflow-hidden rounded-md border bg-white">
+            <div
+              className="border-border relative mx-auto my-4 aspect-video w-full overflow-hidden rounded-md border"
+              style={{
+                backgroundImage: `url(${image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              <div className="z-10 h-full w-full backdrop-blur-sm duration-500"></div>
               <Image
                 fill={true}
                 src={image}
                 alt={name}
-                className="object-contain transition-transform hover:scale-105"
+                className="z-20 object-contain transition-transform duration-[250ms] ease-[cubic-bezier(.17,.67,.83,.67)] hover:scale-105"
               />
             </div>
           </CardContent>
