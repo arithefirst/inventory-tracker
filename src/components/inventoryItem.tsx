@@ -4,7 +4,7 @@ import type { Item } from '@/db/schema';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export function InventoryItem({ id, name, createdAt, updatedAt, image, customData }: Item) {
+export function InventoryItem({ id, name, createdAt, updatedAt, images, customData }: Item) {
   function formatDate(date: Date): string {
     return date.toLocaleString('en-US', {
       year: 'numeric',
@@ -23,7 +23,7 @@ export function InventoryItem({ id, name, createdAt, updatedAt, image, customDat
           <p className="w-full text-center font-bold">{name}</p>
           <div className="grid grid-cols-2">
             <div className="relative mx-auto my-4 aspect-square w-3/4 rounded-md border object-cover">
-              <Image fill={true} src={image} alt={name} className="rounded-md" />
+              <Image fill={true} src={images[0]} alt={name} className="rounded-md" />
             </div>
             <Table className="mx-auto my-4 w-fit">
               <TableBody>

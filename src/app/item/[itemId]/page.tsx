@@ -10,7 +10,7 @@ import { CopyCell } from '@/components/copyCell';
 
 export default async function Page({ params }: { params: Promise<{ itemId: number }> }) {
   const { itemId } = await params;
-  const { name, image, id, createdAt, updatedAt, customData } = (
+  const { name, images, id, createdAt, updatedAt, customData } = (
     await db.select().from(items).where(eq(items.id, itemId))
   )[0];
 
@@ -35,38 +35,43 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
         <ThemeToggle className="ml-auto" />
       </header>
       <main className="grid flex-1 grid-cols-6 grid-rows-1 gap-4 p-2">
-        <Card className="col-span-2">
+        <Card className="col-span-2 flex flex-col">
           <CardHeader>
             <CardTitle>
               {name} <span className="font-thin">(Images)</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div
-              className="border-border relative mx-auto my-4 aspect-video w-full overflow-hidden rounded-md border"
-              style={{
-                backgroundImage: `url(${image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
-              <div className="z-10 h-full w-full backdrop-blur-sm duration-500"></div>
-              <Image
-                fill={true}
-                src={image}
-                alt={name}
-                className="z-20 object-contain transition-transform duration-[250ms] ease-[cubic-bezier(.17,.67,.83,.67)] hover:scale-105"
-              />
-            </div>
+          <CardContent className="mx-auto max-h-[calc(100vh-12rem)] w-11/12 flex-1 overflow-y-auto border-t border-b">
+            {images.map((image) => {
+              return (
+                <div
+                  key={image}
+                  className="border-border relative mx-auto my-4 aspect-video w-full overflow-hidden rounded-md border"
+                  style={{
+                    backgroundImage: `url(${image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div className="z-10 h-full w-full backdrop-blur-sm duration-500"></div>
+                  <Image
+                    fill={true}
+                    src={image}
+                    alt={name}
+                    className="z-20 object-contain transition-transform duration-[250ms] ease-[cubic-bezier(.17,.67,.83,.67)] hover:scale-105"
+                  />
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
-        <Card className="col-span-4">
+        <Card className="col-span-4 flex flex-col">
           <CardHeader>
             <CardTitle>
               {name} <span className="font-thin">(Data)</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="max-h-[calc(100vh-12rem)] flex-1 overflow-y-auto">
             <Table className="border-t">
               <TableBody>
                 <TableRow>
