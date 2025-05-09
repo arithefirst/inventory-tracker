@@ -45,3 +45,25 @@ export async function updateDataValue(field: string, itemId: number, newValue: s
 
   revalidatePath(`/item/${itemId}`);
 }
+
+export async function addCustomField(field: string, value: string | number, itemId: number) {
+  const result = await db
+    .select({
+      customData: items.customData,
+    })
+    .from(items)
+    .where(eq(items.id, itemId));
+
+  let { customData } = result[0];
+  if (!customData) customData = {};
+
+  if (customData[field] === undefined) {
+    customData[field] = value;
+    await db.update(items).set({
+      customData,
+      updatedAt: new Date(),
+    });
+  }
+
+  revalidatePath(`/item/${itemId}`);
+}

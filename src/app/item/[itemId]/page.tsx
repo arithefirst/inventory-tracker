@@ -1,3 +1,4 @@
+import { AddCustomField } from '@/components/addCustomField';
 import { DataTableRow } from '@/components/dataTableRow';
 import { ThemeToggle } from '@/components/themeToggle';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,8 +72,8 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
               {name} <span className="font-thin">(Data)</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="max-h-[calc(100vh-12rem)] flex-1 overflow-y-auto">
-            <Table className="border-t">
+          <CardContent className="flex max-h-[calc(100vh-12rem)] flex-1 flex-col items-center gap-2 overflow-y-auto">
+            <Table className="border-t border-b">
               <TableBody>
                 <DataTableRow itemInternal="id" item="ID" value={id} itemId={id}></DataTableRow>
                 <DataTableRow itemInternal="name" item="Name" value={name} itemId={id}></DataTableRow>
@@ -107,6 +108,7 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
                 )}
               </TableBody>
             </Table>
+            <AddCustomField itemId={id} />
           </CardContent>
         </Card>
       </main>
