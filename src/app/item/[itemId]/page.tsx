@@ -8,12 +8,14 @@ import { items } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import Image from 'next/image';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default async function Page({ params }: { params: Promise<{ itemId: number }> }) {
   const { itemId } = await params;
-  const { name, images, id, createdAt, updatedAt, customData } = (
-    await db.select().from(items).where(eq(items.id, itemId))
-  )[0];
+  const itemData = await db.select().from(items).where(eq(items.id, itemId));
+  if (itemData.length === 0) notFound();
+
+  const { name, images, id, createdAt, updatedAt, customData } = itemData[0];
 
   function formatDate(date: Date): string {
     return date.toLocaleString('en-US', {
