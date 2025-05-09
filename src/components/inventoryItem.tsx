@@ -4,15 +4,17 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
-export function InventoryItem({ id, name, createdAt, image, customData }: Item) {
-  const formattedDate = createdAt.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  });
+export function InventoryItem({ id, name, createdAt, updatedAt, image, customData }: Item) {
+  function formatDate(date: Date): string {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    });
+  }
 
   return (
     <Card className="hover:border-primary hover:shadow-primary/30 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl">
@@ -30,7 +32,11 @@ export function InventoryItem({ id, name, createdAt, image, customData }: Item) 
               </TableRow>
               <TableRow>
                 <TableCell className="font-bold">Created At</TableCell>
-                <TableCell>{formattedDate}</TableCell>
+                <TableCell>{formatDate(createdAt)}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-bold">Updated At</TableCell>
+                <TableCell>{formatDate(updatedAt)}</TableCell>
               </TableRow>
               {/* Itterate over the object.keys of customdata so we can display */}
               {/* user-created fields in addition to the hardcoded ones */}

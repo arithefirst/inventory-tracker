@@ -1,0 +1,1 @@
+ALTER TABLE "item" ADD COLUMN "updated_at" timestamp NOT NULL;
