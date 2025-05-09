@@ -1,12 +1,12 @@
+import { DataTableRow } from '@/components/dataTableRow';
 import { ThemeToggle } from '@/components/themeToggle';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody } from '@/components/ui/table';
 import { db } from '@/db/drizzle';
 import { items } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import Link from 'next/link';
 import Image from 'next/image';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CopyCell } from '@/components/copyCell';
+import Link from 'next/link';
 
 export default async function Page({ params }: { params: Promise<{ itemId: number }> }) {
   const { itemId } = await params;
@@ -74,32 +74,23 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
           <CardContent className="max-h-[calc(100vh-12rem)] flex-1 overflow-y-auto">
             <Table className="border-t">
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-bold">ID</TableCell>
-                  <TableCell>{id}</TableCell>
-                  <CopyCell value={id} property="ID" />
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-bold">Created At</TableCell>
-                  <TableCell>{formatDate(createdAt)}</TableCell>
-                  <CopyCell value={formatDate(createdAt)} property="Created At" />
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-bold">Updated At</TableCell>
-                  <TableCell>{formatDate(updatedAt)}</TableCell>
-                  <CopyCell value={formatDate(updatedAt)} property="Updated At" />
-                </TableRow>
+                <DataTableRow itemInternal="id" item="ID" value={id}></DataTableRow>
+                <DataTableRow itemInternal="name" item="Name" value={name}></DataTableRow>
+                <DataTableRow
+                  itemInternal="createdAt"
+                  item="Created At"
+                  value={formatDate(createdAt)}
+                ></DataTableRow>
+                <DataTableRow
+                  itemInternal="updatedAt"
+                  item="Updated At"
+                  value={formatDate(updatedAt)}
+                ></DataTableRow>
                 {/* Itterate over the object.keys of customdata so we can display */}
                 {/* user-created fields in addition to the hardcoded ones */}
                 {customData ? (
                   Object.keys(customData).map((key) => {
-                    return (
-                      <TableRow key={key}>
-                        <TableCell className="font-bold">{key}</TableCell>
-                        <TableCell>{`${customData[key]}`}</TableCell>
-                        <CopyCell value={customData[key]} property={key} />
-                      </TableRow>
-                    );
+                    return <DataTableRow itemInternal="customData" item={key} key={key} value={customData[key]} />;
                   })
                 ) : (
                   <></>
