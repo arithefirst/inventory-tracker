@@ -2,10 +2,10 @@ import { InventoryItem } from '@/components/inventoryItem';
 import { ThemeToggle } from '@/components/themeToggle';
 import { db } from '@/db/drizzle';
 import { items } from '@/db/schema';
+import { BlurIn } from '@/components/blurIn';
 
 export default async function Home() {
   const inventory = await db.select().from(items);
-
   return (
     <div className="flex min-h-screen w-screen flex-col">
       <header className="border-b-border flex w-screen items-center border-b px-4 py-2">
@@ -20,11 +20,11 @@ export default async function Home() {
           <h1 className="text-foreground/40 text-3xl">No items in inventory.</h1>
         </main>
       ) : (
-        <main className="grid grid-cols-3 gap-2 p-2">
+        <BlurIn className="grid grid-cols-3 gap-2 p-2">
           {inventory.map((item) => (
             <InventoryItem {...item} key={item.id} />
           ))}
-        </main>
+        </BlurIn>
       )}
     </div>
   );
