@@ -13,8 +13,6 @@ import { redirect } from 'next/navigation';
  * @param newValue New value for the field being updated
  */
 export async function updateDataValue(field: string, itemId: number, newValue: string | number) {
-  console.log(`Updating field ${field}`);
-
   // If it's a customData field, pull the customData object and
   // apply the changes only to the needed field
   if (field.split('.')[0] === 'customData') {
@@ -65,6 +63,8 @@ export async function addCustomField(field: string, value: string | number, item
   let { customData } = result[0];
   if (!customData) customData = {};
 
+  console.log(customData[field]);
+
   if (customData[field] === undefined) {
     customData[field] = value;
     await db
@@ -74,6 +74,8 @@ export async function addCustomField(field: string, value: string | number, item
         updatedAt: new Date(),
       })
       .where(eq(items.id, itemId));
+  } else {
+    throw new Error('DUPLICATE_NAME');
   }
 
   revalidatePath(`/item/${itemId}`);

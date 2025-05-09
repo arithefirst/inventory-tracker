@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Loader, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function AddCustomField({ itemId }: { itemId: number }) {
   const [field, setField] = useState<string>('');
@@ -21,6 +21,8 @@ export function AddCustomField({ itemId }: { itemId: number }) {
   const [open, setOpen] = useState<boolean>(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [valueError, setValueError] = useState<string | null>(null);
+
+  useEffect(() => console.log(fieldError), [fieldError]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); // Prevent default form submission
@@ -38,7 +40,18 @@ export function AddCustomField({ itemId }: { itemId: number }) {
     }
 
     setLoading(true);
-    await addCustomField(field, value, itemId);
+    try {
+      await addCustomField(field, value, itemId);
+    } catch (e) {
+      if ((e as Error).message === 'DUPLICATE_NAME') {
+        setFieldError('A field with that name already exists');
+      } else {
+        console.error(e);
+      }
+      setLoading(false);
+      return;
+    }
+
     setLoading(false);
     setOpen(false);
   }
