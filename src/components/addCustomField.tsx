@@ -13,7 +13,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Loader, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { Label } from './ui/label';
 
 export function AddCustomField({ itemId }: { itemId: number }) {
   const [field, setField] = useState<string>('');
@@ -59,7 +58,6 @@ export function AddCustomField({ itemId }: { itemId: number }) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="contents">
           <div>
-            <Label htmlFor="customFieldName"></Label>
             <Input
               id="customFieldName"
               placeholder="Field Name"
@@ -69,7 +67,6 @@ export function AddCustomField({ itemId }: { itemId: number }) {
             {fieldError ? <span className="text-sm text-red-700">{fieldError}</span> : ''}
           </div>
           <div>
-            <Label htmlFor="customFieldValue"></Label>
             <Input
               id="customFieldValue"
               placeholder="Field Contents"
