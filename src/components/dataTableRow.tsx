@@ -13,6 +13,7 @@ interface DataTableRowProps {
   value: string | number;
   itemInternal: string;
   itemId: number;
+  date?: boolean;
 }
 
 async function copy(item: string, value: string | number) {
@@ -29,7 +30,7 @@ async function copy(item: string, value: string | number) {
   }
 }
 
-export function DataTableRow({ item, value, itemInternal, itemId }: DataTableRowProps) {
+export function DataTableRow({ item, value, itemInternal, itemId, date = false }: DataTableRowProps) {
   const [isEditing, setEditing] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number>(value);
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
@@ -47,6 +48,18 @@ export function DataTableRow({ item, value, itemInternal, itemId }: DataTableRow
     }
     setUpdateLoading(false);
     setEditing(false);
+  }
+
+  function formatDate(): string {
+    return new Date(value).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      timeZoneName: 'longGeneric',
+      hour12: true,
+    });
   }
 
   return (
@@ -82,7 +95,7 @@ export function DataTableRow({ item, value, itemInternal, itemId }: DataTableRow
             </div>
           </TableCell>
         ) : (
-          <TableCell>{value}</TableCell>
+          <TableCell>{date ? formatDate() : value}</TableCell>
         )}
         <TableCell className="flex gap-2">
           <Button

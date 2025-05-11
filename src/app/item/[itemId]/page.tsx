@@ -17,17 +17,6 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
 
   const { name, images, id, createdAt, updatedAt, customData } = itemData[0];
 
-  function formatDate(date: Date): string {
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    });
-  }
-
   return (
     <div className="flex min-h-screen w-screen flex-col">
       <header className="border-b-border flex w-screen items-center border-b px-4 py-2">
@@ -82,14 +71,16 @@ export default async function Page({ params }: { params: Promise<{ itemId: numbe
                 <DataTableRow
                   itemInternal="createdAt"
                   item="Created At"
-                  value={formatDate(createdAt)}
+                  value={createdAt.toISOString()}
                   itemId={id}
+                  date
                 ></DataTableRow>
                 <DataTableRow
                   itemInternal="updatedAt"
                   item="Updated At"
-                  value={formatDate(updatedAt)}
+                  value={updatedAt.toISOString()}
                   itemId={id}
+                  date
                 ></DataTableRow>
                 {/* Itterate over the object.keys of customdata so we can display */}
                 {/* user-created fields in addition to the hardcoded ones */}
