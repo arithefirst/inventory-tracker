@@ -7,7 +7,7 @@ interface BlurInProps {
   className?: string;
   duration?: number;
   delay?: number;
-  key?: string | number;
+  childKey?: string | number;
 }
 
 /**
@@ -17,17 +17,22 @@ interface BlurInProps {
  * @param delay animation delay in ms (defaults to 100)
  * @returns
  */
-export function BlurIn({ children, className, duration, delay, key }: BlurInProps) {
+export function BlurIn({ children, className, duration, delay, childKey }: BlurInProps) {
   duration = duration ? duration / 1000 : 300 / 1000;
   delay = delay ? delay / 1000 : 100 / 1000;
 
   return (
     <motion.div
+      variants={{
+        absent: { filter: 'blur(30px)', opacity: 0, translateY: 6 },
+        active: { filter: 'blur(0px)', opacity: 1, translateY: 0 },
+      }}
       className={className}
-      initial={{ filter: 'blur(30px)', opacity: 0, translateY: 6 }}
-      animate={{ filter: 'blur(0px)', opacity: 1, translateY: 0 }}
+      initial="absent"
+      animate="active"
+      exit="absent"
       transition={{ duration, delay }}
-      key={key}
+      key={childKey}
     >
       {children}
     </motion.div>
