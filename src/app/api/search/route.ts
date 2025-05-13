@@ -3,6 +3,16 @@ import { items } from '@/db/schema';
 import { sql } from 'drizzle-orm';
 import { type NextRequest } from 'next/server';
 
+export type SearchReturnData = {
+  error?: string;
+  results?: {
+    id: number;
+    rank: number;
+    images: string[];
+    name: string;
+  }[];
+};
+
 export async function GET(request: NextRequest) {
   const query: string | null = request.nextUrl.searchParams.get('q');
 
@@ -13,16 +23,23 @@ export async function GET(request: NextRequest) {
     });
 
   try {
+    const processedQuery = query.trim().split(/\s+/).join(':* & ') + ':*';
     const tsvectorExpression = sql`to_tsvector('english', ${items.name} || ' ' || ${items.id} || ' ' || COALESCE(${items.customData}::text, ''))`;
-    const tsqueryExpression = sql`websearch_to_tsquery('english', ${query})`;
+    const tsqueryExpression = sql`to_tsquery('english', ${processedQuery})`;
+
+    console.log(processedQuery);
 
     const results = await db
       .select({
         id: items.id,
+        images: items.images,
+        name: items.name,
         rank: sql`ts_rank(${tsvectorExpression}, ${tsqueryExpression})`,
       })
       .from(items)
       .where(sql`${tsvectorExpression} @@ ${tsqueryExpression}`);
+
+    console.log(typeof results[0].rank);
 
     return new Response(JSON.stringify({ results }), {
       status: 200,
