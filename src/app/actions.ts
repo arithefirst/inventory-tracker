@@ -63,8 +63,6 @@ export async function addCustomField(field: string, value: string | number, item
   let { customData } = result[0];
   if (!customData) customData = {};
 
-  console.log(customData[field]);
-
   if (customData[field] === undefined) {
     customData[field] = value;
     await db
@@ -77,6 +75,32 @@ export async function addCustomField(field: string, value: string | number, item
   } else {
     throw new Error('DUPLICATE_NAME');
   }
+
+  revalidatePath(`/item/${itemId}`);
+}
+
+/**
+ *  Deletes a custom field
+ * @param fieldName Name of the field to delete
+ * @param itemId ID of the item the field exists on
+ */
+export async function deleteCustomField(fieldName: string, itemId: number) {
+  const result = await db
+    .select({
+      customData: items.customData,
+    })
+    .from(items)
+    .where(eq(items.id, itemId));
+
+  const customData = { ...result[0].customData, [fieldName]: undefined };
+
+  await db
+    .update(items)
+    .set({
+      customData,
+      updatedAt: new Date(),
+    })
+    .where(eq(items.id, itemId));
 
   revalidatePath(`/item/${itemId}`);
 }

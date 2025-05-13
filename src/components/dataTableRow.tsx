@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Clipboard, ClipboardCheck, ClipboardX, Loader, Pencil, X } from 'lucide-react';
+import { Clipboard, ClipboardCheck, ClipboardX, Loader, Pencil, Trash, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { deleteCustomField } from '@/app/actions';
+
 interface DataTableRowProps {
   item: string;
   value: string | number;
@@ -34,8 +36,10 @@ export function DataTableRow({ item, value, itemInternal, itemId, date = false }
   const [isEditing, setEditing] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string | number>(value);
   const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [dupeIdError, setDupeIdError] = useState<boolean>(false);
   const fieldEditable = itemInternal !== 'updatedAt' && itemInternal !== 'createdAt';
+  const isCustomData = itemInternal.split('.')[0] === 'customData';
 
   async function executeUpdate() {
     setUpdateLoading(true);
@@ -48,6 +52,16 @@ export function DataTableRow({ item, value, itemInternal, itemId, date = false }
     }
     setUpdateLoading(false);
     setEditing(false);
+  }
+
+  async function deleteField() {
+    setDeleteLoading(true);
+    try {
+      await deleteCustomField(itemInternal.split('.')[1], itemId);
+    } catch (e) {
+      console.error(e);
+    }
+    setDeleteLoading(false);
   }
 
   function formatDate(): string {
@@ -101,13 +115,16 @@ export function DataTableRow({ item, value, itemInternal, itemId, date = false }
           <Button
             onClick={() => copy(item, value)}
             size={fieldEditable ? 'icon' : 'default'}
-            className={'text-primary-foreground my-auto cursor-pointer ' + (fieldEditable ? 'w-9' : 'w-20')}
+            className={
+              'text-primary-foreground my-auto cursor-pointer ' +
+              (fieldEditable ? (isCustomData ? 'w-9' : 'w-20') : 'w-31')
+            }
             title="Copy property value to clipboard"
           >
             <Clipboard />
           </Button>
 
-          {fieldEditable ? (
+          {fieldEditable && (
             <Button
               onClick={() => setEditing((s) => !s)}
               size="icon"
@@ -116,8 +133,18 @@ export function DataTableRow({ item, value, itemInternal, itemId, date = false }
             >
               {isEditing ? <X /> : <Pencil />}
             </Button>
-          ) : (
-            <></>
+          )}
+
+          {isCustomData && (
+            <Button
+              onClick={() => deleteField()}
+              size={fieldEditable ? 'icon' : 'default'}
+              className={'text-primary-foreground my-auto cursor-pointer'}
+              title="Delete custom field"
+              variant="destructive"
+            >
+              {deleteLoading ? <Loader className="animate-spin" /> : <Trash />}
+            </Button>
           )}
         </TableCell>
       </TableRow>
