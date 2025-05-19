@@ -18,7 +18,7 @@ export function InventoryItem({ id, name, createdAt, updatedAt, images, customDa
 
   return (
     <Link href={`/item/${id}`}>
-      <Card className="hover:border-primary hover:shadow-primary/30 cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl">
+      <Card className="hover:border-primary hover:shadow-primary/30 h-full cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl">
         <CardContent>
           <p className="w-full text-center font-bold">{name}</p>
           <div className="grid grid-cols-2">
